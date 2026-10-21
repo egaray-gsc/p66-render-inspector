@@ -1,0 +1,59 @@
+{
+  "manifest_version": 3,
+  "name": "P66 Render Inspector",
+  "version": "1.2.0",
+  "description": "Muestra si una página de La Vanguardia o Mundo Deportivo la sirve P66, Xalok o Xalok como fallback, con versiones de assets y publicidad.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoo5dziI70ctdAai4CuvIf/ERAsAVnoWfWAfl8KuphOnqIMybU8ioob6MOA/Au+6bcqoSs3Fc9nvgGcV6r0XwgLdMRtWg7HGl5Iz9G815UvMlyfvrqLKG90r+4eB0kne8fxOTYyiSTS44sQooPTcZyJuNWNLTYCf1wZlMlsij5mZugs5ewlzoQaBa9Zb/hfXLMMFL/yCqkFyuhpsJFlmUlNof0tLiL/62csItOrX4vNKsiXOtq5AEb8tiSQhojpxMwsYw1WC8XF9yFNQbtAI5elgCUibQoibeithXoQ0ROM1w9e96hjSxVld0hV1d1lrwU+LwoKEszUryLaJt4trR8wIDAQAB",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "P66 Render Inspector: plegar o desplegar el panel",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "options_page": "options/options.html",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "webRequest",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.lavanguardia.com/*",
+    "*://*.lavanguardia.biz/*",
+    "*://*.mundodeportivo.com/*",
+    "*://*.mundodeportivo.biz/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.lavanguardia.com/*",
+        "*://*.lavanguardia.biz/*",
+        "*://*.mundodeportivo.com/*",
+        "*://*.mundodeportivo.biz/*"
+      ],
+      "exclude_matches": [
+        "*://ggcstatic.lavanguardia.com/*",
+        "*://ggcstatic.lavanguardia.biz/*",
+        "*://ggcstatic.mundodeportivo.com/*",
+        "*://ggcstatic.mundodeportivo.biz/*",
+        "*://p66.lavanguardia.com/*",
+        "*://p66.lavanguardia.biz/*",
+        "*://p66.mundodeportivo.com/*",
+        "*://p66.mundodeportivo.biz/*"
+      ],
+      "js": [
+        "lib/render.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
