@@ -53,16 +53,46 @@ Només la cantonada del widget: clic dret a la icona → **Opcions**.
 
 ## Instal·lar
 
-1. Descarrega o clona aquesta carpeta (`p66-render-inspector/`).
-2. A Chrome, obre `chrome://extensions` i activa el **Mode de desenvolupador** (a dalt a la dreta).
-3. Prem **Carrega l'extensió sense empaquetar** i tria la carpeta `p66-render-inspector`.
-4. Opcional: fixa la icona a la barra (la icona del trencaclosques → xinxeta) per veure l'estat sempre. Quan la pàgina té estat, la icona es converteix en un quadrat del color del semàfor amb el text (`P66`, `FB`, `XK`, `!?`).
+Al Chrome corporatiu, l'extensió s'instal·la arrossegant el `.crx` signat a `chrome://extensions`, després d'actualitzar les polítiques amb `gpupdate /force`. Pas a pas: **[docs/INSTALACION.md](docs/INSTALACION.md)**.
 
-Per actualitzar: baixa els canvis i prem el botó de recarregar de l'extensió a `chrome://extensions`. Funciona igual a Edge (`edge://extensions`) i a qualsevol Chromium.
+El `.crx` es descarrega de les [Releases](https://github.com/egaray-gsc/p66-render-inspector/releases/latest), dins d'un `.zip` perquè Chrome no el bloquegi com a fitxer sospitós.
 
-Les pestanyes que ja estaven obertes en instal·lar-la no tenen dades fins que es recarreguen.
+L'ID és sempre `ilhlmkjikoindjjhdjgmpnfojckggjcd`: el `manifest.json` porta la clau pública (`key`) i el `.crx` es signa amb la clau privada corresponent. És l'ID que IT té a la llista blanca. Si canvia la clau, canvia l'ID i cal tornar a demanar-ho a IT.
 
-El `manifest.json` porta una clau pública (`key`), així que l'ID és sempre `ilhlmkjikoindjjhdjgmpnfojckggjcd`, a qualsevol PC i des de qualsevol carpeta. És l'ID que cal donar a IT per a la llista blanca.
+### Per desenvolupar
+
+En un Chrome sense polítiques d'empresa (o a Edge, `edge://extensions`):
+
+1. Clona el repositori.
+2. Obre `chrome://extensions` i activa el **Mode de desenvolupador** (a dalt a la dreta).
+3. Prem **Carrega l'extensió sense empaquetar** i tria la carpeta del repositori.
+
+Per veure els canvis, prem el botó de recarregar de l'extensió a `chrome://extensions`. Les pestanyes que ja estaven obertes no tenen dades fins que es recarreguen.
+
+## Publicar una versió nova
+
+1. Puja `version` a `manifest.json` (per exemple, de `1.2.0` a `1.2.1`).
+2. Fes push a `main`.
+
+El workflow [`.github/workflows/release.yml`](.github/workflows/release.yml) fa la resta:
+
+- Empaqueta els fitxers de l'extensió i els signa amb `scripts/pack-crx.js` (format CRX3, sense dependències).
+- Comprova que la clau dona l'ID `ilhlmkjikoindjjhdjgmpnfojckggjcd`. Si no, falla.
+- Crea la release `vX.Y.Z` amb `p66-render-inspector-X.Y.Z.zip`, que conté el `.crx`.
+
+Si es fa push sense canviar la versió, el workflow no publica res i deixa un avís. També es pot llançar a mà des de la pestanya **Actions** (*Run workflow*).
+
+La clau privada és al secret del repositori `CRX_PRIVATE_KEY` (el contingut del `.pem`). No es puja mai al repositori. Per canviar-la:
+
+```bash
+gh secret set CRX_PRIVATE_KEY -R egaray-gsc/p66-render-inspector < p66-render-inspector-key.pem
+```
+
+Per generar un `.crx` en local amb la mateixa clau:
+
+```bash
+node scripts/pack-crx.js extensio.zip p66-render-inspector-key.pem p66-render-inspector.crx ilhlmkjikoindjjhdjgmpnfojckggjcd
+```
 
 ## Permisos
 
@@ -83,6 +113,9 @@ content.js          Llegeix body, assets i ggPageData; pinta el widget
 lib/render.js       Classificació del render, assets i URL del JSON (compartit)
 options/            Cantonada del widget
 icons/              16, 32, 48 i 128 px
+scripts/pack-crx.js Signa el .zip de l'extensió i en fa un .crx (el fa servir el workflow)
+.github/workflows/  Release automàtica en canviar la versió
+docs/               Guia d'instal·lació i sol·licitud a IT
 ```
 
 La classificació segueix els mateixos senyals que `scripts/detect-render.js` del repo `aws-ggc-reports-url` (pipeline d'auditoria CWV).
