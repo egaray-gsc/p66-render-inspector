@@ -77,4 +77,4 @@ jobs:
             --target "$GITHUB_SHA" \
             --title "P66 Render Inspector $VERSION" \
             --generate-notes \
-            --notes "Instal·lació: [docs/INSTALLACIO.md](https://github.com/${{ github.repository }}/blob/v$VERSION/docs/INSTALLACIO.md). ID de l'extensió: \`$EXTENSION_ID\`."
+            --notes "Instalación: [docs/INSTALACION.md](https://github.com/${{ github.repository }}/blob/v$VERSION/docs/INSTALACION.md). ID de la extensión: \`$EXTENSION_ID\`."

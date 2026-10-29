@@ -53,7 +53,7 @@ Només la cantonada del widget: clic dret a la icona → **Opcions**.
 
 ## Instal·lar
 
-Al Chrome corporatiu, l'extensió s'instal·la arrossegant el `.crx` signat a `chrome://extensions`, després d'actualitzar les polítiques amb `gpupdate /force`. Pas a pas: **[docs/INSTALLACIO.md](docs/INSTALLACIO.md)**.
+Al Chrome corporatiu, l'extensió s'instal·la arrossegant el `.crx` signat a `chrome://extensions`, després d'actualitzar les polítiques amb `gpupdate /force`. Pas a pas: **[docs/INSTALACION.md](docs/INSTALACION.md)**.
 
 El `.crx` es descarrega de les [Releases](https://github.com/egaray-gsc/p66-render-inspector/releases/latest), dins d'un `.zip` perquè Chrome no el bloquegi com a fitxer sospitós.
 
