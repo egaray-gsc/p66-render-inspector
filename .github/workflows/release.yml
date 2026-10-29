@@ -1,0 +1,80 @@
+# Quan a main hi arriba una versió nova del manifest.json, empaqueta l'extensió,
+# la signa (.crx) i publica una release vX.Y.Z amb el .crx dins d'un .zip.
+# Si la versió ja té release, no fa res: per publicar cal pujar "version" al manifest.
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - manifest.json
+      - background.js
+      - content.js
+      - lib/**
+      - icons/**
+      - options/**
+      - scripts/pack-crx.js
+      - .github/workflows/release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  EXTENSION_ID: ilhlmkjikoindjjhdjgmpnfojckggjcd
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Llegir la versió
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(node -p "require('./manifest.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "::warning::La versió $VERSION ja té release. Puja \"version\" a manifest.json per publicar-ne una de nova."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Empaquetar i signar
+        if: steps.version.outputs.exists == 'false'
+        env:
+          CRX_PRIVATE_KEY: ${{ secrets.CRX_PRIVATE_KEY }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if [ -z "$CRX_PRIVATE_KEY" ]; then
+            echo "::error::Falta el secret CRX_PRIVATE_KEY (la clau .pem que dona l'ID $EXTENSION_ID)."
+            exit 1
+          fi
+          KEY="$RUNNER_TEMP/key.pem"
+          printf '%s\n' "$CRX_PRIVATE_KEY" > "$KEY"
+          mkdir -p out
+          zip -qr -X "$RUNNER_TEMP/extension.zip" manifest.json background.js content.js lib icons options
+          node scripts/pack-crx.js "$RUNNER_TEMP/extension.zip" "$KEY" "out/p66-render-inspector-$VERSION.crx" "$EXTENSION_ID"
+          rm -f "$KEY"
+          # Chrome marca com a sospitosa la descàrrega directa d'un .crx; dins d'un .zip passa.
+          (cd out && zip -q "p66-render-inspector-$VERSION.zip" "p66-render-inspector-$VERSION.crx")
+
+      - name: Publicar la release
+        if: steps.version.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release create "v$VERSION" "out/p66-render-inspector-$VERSION.zip" \
+            --target "$GITHUB_SHA" \
+            --title "P66 Render Inspector $VERSION" \
+            --generate-notes \
+            --notes "Instal·lació: [docs/INSTALLACIO.md](https://github.com/${{ github.repository }}/blob/v$VERSION/docs/INSTALLACIO.md). ID de l'extensió: \`$EXTENSION_ID\`."
