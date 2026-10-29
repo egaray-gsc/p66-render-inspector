@@ -115,7 +115,7 @@ options/            Cantonada del widget
 icons/              16, 32, 48 i 128 px
 scripts/pack-crx.js Signa el .zip de l'extensió i en fa un .crx (el fa servir el workflow)
 .github/workflows/  Release automàtica en canviar la versió
-docs/               Guia d'instal·lació i sol·licitud a IT
+docs/               Guia d'instal·lació
 ```
 
 La classificació segueix els mateixos senyals que `scripts/detect-render.js` del repo `aws-ggc-reports-url` (pipeline d'auditoria CWV).
