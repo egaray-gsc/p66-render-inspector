@@ -17,7 +17,7 @@ if (!zipPath || !keyPath || !outPath) {
 }
 
 const zip = fs.readFileSync(zipPath);
-const privateKey = crypto.createPrivateKey(fs.readFileSync(keyPath));
+const privateKey = crypto.createPrivateKey(readPem(keyPath));
 const publicKey = crypto.createPublicKey(privateKey).export({ type: 'spki', format: 'der' });
 
 // L'ID d'una extensió són els 16 primers bytes del SHA-256 de la clau pública,
@@ -52,6 +52,19 @@ const header = Buffer.concat([
 
 fs.writeFileSync(outPath, Buffer.concat([Buffer.from('Cr24'), uint32(3), uint32(header.length), header, zip]));
 console.log(`${outPath} (ID ${extensionId})`);
+
+// Reconstrueix el PEM: un secret enganxat des de la web pot arribar amb BOM, CRLF,
+// espais o tot en una línia, i OpenSSL no l'accepta.
+function readPem(path) {
+  const text = fs.readFileSync(path, 'utf8').replace(/^﻿/, '');
+  const match = text.match(/-----BEGIN ([A-Z ]+)-----([\s\S]*?)-----END \1-----/);
+  if (!match) {
+    console.error(`${path} no és una clau PEM: hi falten les línies -----BEGIN ...----- i -----END ...-----.`);
+    process.exit(1);
+  }
+  const body = match[2].replace(/\s+/g, '').match(/.{1,64}/g).join('\n');
+  return `-----BEGIN ${match[1]}-----\n${body}\n-----END ${match[1]}-----\n`;
+}
 
 function toLetter(n) {
   return String.fromCharCode(97 + n);
