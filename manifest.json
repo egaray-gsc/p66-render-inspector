@@ -1,7 +1,8 @@
 {
   "manifest_version": 3,
   "name": "P66 Render Inspector",
-  "version": "1.2.0",
+  "version": "1.3.0",
+  "update_url": "https://github.com/egaray-gsc/p66-render-inspector/releases/latest/download/updates.xml",
   "description": "Muestra si una página de La Vanguardia o Mundo Deportivo la sirve P66, Xalok o Xalok como fallback, con versiones de assets y publicidad.",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoo5dziI70ctdAai4CuvIf/ERAsAVnoWfWAfl8KuphOnqIMybU8ioob6MOA/Au+6bcqoSs3Fc9nvgGcV6r0XwgLdMRtWg7HGl5Iz9G815UvMlyfvrqLKG90r+4eB0kne8fxOTYyiSTS44sQooPTcZyJuNWNLTYCf1wZlMlsij5mZugs5ewlzoQaBa9Zb/hfXLMMFL/yCqkFyuhpsJFlmUlNof0tLiL/62csItOrX4vNKsiXOtq5AEb8tiSQhojpxMwsYw1WC8XF9yFNQbtAI5elgCUibQoibeithXoQ0ROM1w9e96hjSxVld0hV1d1lrwU+LwoKEszUryLaJt4trR8wIDAQAB",
   "icons": {

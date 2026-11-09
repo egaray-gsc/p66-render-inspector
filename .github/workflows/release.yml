@@ -66,6 +66,17 @@ jobs:
           rm -f "$KEY"
           # Chrome marca com a sospitosa la descàrrega directa d'un .crx; dins d'un .zip passa.
           (cd out && zip -q "p66-render-inspector-$VERSION.zip" "p66-render-inspector-$VERSION.crx")
+          # Manifest d'actualitzacions: el update_url del manifest.json apunta a
+          # releases/latest/download/updates.xml. Chrome el consulta cada poques hores i,
+          # si la versió és més alta que la instal·lada, baixa el .crx d'aquesta release.
+          cat > out/updates.xml <<EOF
+          <?xml version='1.0' encoding='UTF-8'?>
+          <gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
+            <app appid='$EXTENSION_ID'>
+              <updatecheck codebase='https://github.com/${{ github.repository }}/releases/download/v$VERSION/p66-render-inspector-$VERSION.crx' version='$VERSION' />
+            </app>
+          </gupdate>
+          EOF
 
       - name: Publicar la release
         if: steps.version.outputs.exists == 'false'
@@ -73,7 +84,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          gh release create "v$VERSION" "out/p66-render-inspector-$VERSION.zip" \
+          gh release create "v$VERSION" \
+            "out/p66-render-inspector-$VERSION.zip" \
+            "out/p66-render-inspector-$VERSION.crx" \
+            out/updates.xml \
             --target "$GITHUB_SHA" \
             --title "P66 Render Inspector $VERSION" \
             --generate-notes \

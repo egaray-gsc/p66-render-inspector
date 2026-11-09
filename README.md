@@ -78,7 +78,24 @@ El workflow [`.github/workflows/release.yml`](.github/workflows/release.yml) fa 
 
 - Empaqueta els fitxers de l'extensió i els signa amb `scripts/pack-crx.js` (format CRX3, sense dependències).
 - Comprova que la clau dona l'ID `ilhlmkjikoindjjhdjgmpnfojckggjcd`. Si no, falla.
-- Crea la release `vX.Y.Z` amb `p66-render-inspector-X.Y.Z.zip`, que conté el `.crx`.
+- Crea la release `vX.Y.Z` amb:
+  - `p66-render-inspector-X.Y.Z.zip`, que conté el `.crx`, per a la instal·lació manual.
+  - `p66-render-inspector-X.Y.Z.crx`, el que baixa Chrome quan actualitza sol.
+  - `updates.xml`, el manifest d'actualitzacions.
+
+### Com s'actualitza sola
+
+El `manifest.json` porta `update_url`, que apunta a `releases/latest/download/updates.xml`. Chrome el consulta cada poques hores. Si hi troba una versió més alta que la instal·lada, baixa el `.crx` que indica i el comprova amb la mateixa clau. Si la signatura no és de la mateixa clau, no l'instal·la.
+
+```xml
+<gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
+  <app appid='ilhlmkjikoindjjhdjgmpnfojckggjcd'>
+    <updatecheck codebase='https://github.com/egaray-gsc/p66-render-inspector/releases/download/v1.3.0/p66-render-inspector-1.3.0.crx' version='1.3.0' />
+  </app>
+</gupdate>
+```
+
+Funciona perquè el repositori és públic: Chrome baixa els fitxers sense credencials. Si el repositori passa a privat, les actualitzacions deixen de funcionar.
 
 Si es fa push sense canviar la versió, el workflow no publica res i deixa un avís. També es pot llançar a mà des de la pestanya **Actions** (*Run workflow*).
 
